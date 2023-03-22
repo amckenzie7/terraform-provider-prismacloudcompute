@@ -94,19 +94,19 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"default_effect": {
-										Type: schema.TypeString,
+										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "The effect to be used. Can be set to 'block', 'prevent', or 'alert'.",
 									},
-									"disabled": { 
-										Type: schema.TypeBool, 
-										Optional: true, 
-										Description: "Whether or not to disable global DNS rule"
-									}, 
+									"disabled": {
+										Type:        schema.TypeBool,
+										Optional:    true,
+										Description: "Whether or not to disable global DNS rule",
+									},
 									"domain_list": {
-										Type: schema.TypeList,
-										Optional: true, 
-										Description: "List of explicitly allowed/denied domains"
+										Type:        schema.TypeList,
+										Optional:    true,
+										Description: "List of explicitly allowed/denied domains",
 										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
 												"allowed": {
@@ -132,9 +132,9 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 												},
 											},
 										},
-									}
-								}
-							}							
+									},
+								},
+							},
 						},
 						"filesystem": {
 							Type:        schema.TypeList,
@@ -157,7 +157,7 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
 									},
 									"default_effect": {
-										Type: schema.TypeString,
+										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
 									},
@@ -165,7 +165,7 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 										Type:        schema.TypeList,
 										Optional:    true,
 										Description: "List of denied file system paths.",
-										Elem: &schema.Schema{
+										Elem: &schema.Resource{
 											Schema: map[string]*schema.Schema{
 												"effect": {
 													Type:        schema.TypeString,
@@ -312,7 +312,7 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 													Type:        schema.TypeString,
 													Optional:    true,
 													Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
-												},	
+												},
 											},
 										},
 									},
@@ -379,7 +379,7 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 													Type:        schema.TypeString,
 													Optional:    true,
 													Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
-												},	
+												},
 											},
 										},
 									},
@@ -452,7 +452,7 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 												},
 											},
 										},
-									}, 
+									},
 									"disabled": {
 										Type:        schema.TypeBool,
 										Optional:    true,
@@ -477,7 +477,7 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
-									},	
+									},
 								},
 							},
 						},
