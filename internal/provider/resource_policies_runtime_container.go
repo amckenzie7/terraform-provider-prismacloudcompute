@@ -40,14 +40,14 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"advanced_protection": {
-							Type:        schema.TypeBool,
+							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "Whether or not to enable advanced protection.",
+							Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
 						},
 						"cloud_metadata_enforcement": {
-							Type:        schema.TypeBool,
+							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "Whether or not to enable cloud metadata access monitoring.",
+							Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
 						},
 						"collections": {
 							Type:        schema.TypeList,
@@ -93,29 +93,48 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 							Description: "DNS configuration.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"allowed": {
-										Type:        schema.TypeList,
+									"default_effect": {
+										Type: schema.TypeString,
 										Optional:    true,
-										Description: "Allowed domains. Wildcard prefixes are supported.",
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
+										Description: "The effect to be used. Can be set to 'block', 'prevent', or 'alert'.",
+									},
+									"disabled": { 
+										Type: schema.TypeBool, 
+										Optional: true, 
+										Description: "Whether or not to disable global DNS rule"
+									}, 
+									"domain_list": {
+										Type: schema.TypeList,
+										Optional: true, 
+										Description: "List of explicitly allowed/denied domains"
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"allowed": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: "Allowed domains. Wildcard prefixes are supported.",
+													Elem: &schema.Schema{
+														Type: schema.TypeString,
+													},
+												},
+												"denied": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: "Denied domains. Wildcard prefixes are supported.",
+													Elem: &schema.Schema{
+														Type: schema.TypeString,
+													},
+												},
+												"deny_effect": {
+													Type:        schema.TypeString,
+													Optional:    true,
+													Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
+												},
+											},
 										},
-									},
-									"denied": {
-										Type:        schema.TypeList,
-										Optional:    true,
-										Description: "Denied domains. Wildcard prefixes are supported.",
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
-										},
-									},
-									"deny_effect": {
-										Type:        schema.TypeString,
-										Optional:    true,
-										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
-									},
-								},
-							},
+									}
+								}
+							}							
 						},
 						"filesystem": {
 							Type:        schema.TypeList,
@@ -132,46 +151,65 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 											Type: schema.TypeString,
 										},
 									},
-									"backdoor_files": {
-										Type:        schema.TypeBool,
-										Optional:    true,
-										Description: "Whether or not to monitor files that can create or persist backdoors (SSH or admin account config files).",
-									},
-									"check_new_files": {
-										Type:        schema.TypeBool,
-										Optional:    true,
-										Description: "Whether or not to detect changes to binaries and certificates.",
-									},
-									"denied": {
-										Type:        schema.TypeList,
-										Optional:    true,
-										Description: "List of denied file system paths.",
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
-										},
-									},
-									"deny_effect": {
+									"backdoor_files_effect": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
 									},
-									"skip_encrypted_binaries": {
-										Type:        schema.TypeBool,
+									"default_effect": {
+										Type: schema.TypeString,
 										Optional:    true,
-										Description: "Whether or not to skip encrypted binaries.",
+										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
 									},
-									"suspicious_elf_headers": {
+									"denied_list": {
+										Type:        schema.TypeList,
+										Optional:    true,
+										Description: "List of denied file system paths.",
+										Elem: &schema.Schema{
+											Schema: map[string]*schema.Schema{
+												"effect": {
+													Type:        schema.TypeString,
+													Optional:    true,
+													Description: "The effect to be used. Can be set to 'block', 'prevent', or alert'.",
+												},
+												"paths": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: "Paths are the paths to alert/prevent/block when an event with one of the paths is triggered. Wildcard prefixes are supported.",
+													Elem: &schema.Schema{
+														Type: schema.TypeString,
+													},
+												},
+											},
+										},
+									},
+									"disabled": {
 										Type:        schema.TypeBool,
 										Optional:    true,
-										Description: "Whether or not to detect suspicious ELF headers.",
+										Description: "Whether or not to disable the filesystem rule",
+									},
+									"encrypted_binaries_effect": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
+									},
+									"new_files_effect": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
+									},
+									"suspicious_elf_headers_effect": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
 									},
 								},
 							},
 						},
 						"kubernetes_enforcement": {
-							Type:        schema.TypeBool,
+							Type:        schema.TypeString,
 							Optional:    true,
-							Description: "Whether or not to detect attacks against the cluster.",
+							Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
 						},
 						"name": {
 							Type:        schema.TypeString,
@@ -185,30 +223,6 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 							Description: "Network configuration.",
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
-									"allowed_listening_port": {
-										Type:        schema.TypeList,
-										Optional:    true,
-										Description: "List of allowed listening ports.",
-										Elem: &schema.Resource{
-											Schema: map[string]*schema.Schema{
-												"deny": {
-													Type:        schema.TypeBool,
-													Optional:    true,
-													Description: "Whether or not to deny the connection.",
-												},
-												"end": {
-													Type:        schema.TypeInt,
-													Optional:    true,
-													Description: "End of the port range.",
-												},
-												"start": {
-													Type:        schema.TypeInt,
-													Optional:    true,
-													Description: "Start of the port range.",
-												},
-											},
-										},
-									},
 									"allowed_outbound_ips": {
 										Type:        schema.TypeList,
 										Optional:    true,
@@ -217,53 +231,10 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 											Type: schema.TypeString,
 										},
 									},
-									"allowed_outbound_port": {
-										Type:        schema.TypeList,
+									"default_effect": {
+										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "List of allowed outbound ports.",
-										Elem: &schema.Resource{
-											Schema: map[string]*schema.Schema{
-												"deny": {
-													Type:        schema.TypeBool,
-													Optional:    true,
-													Description: "Whether or not to deny the connection.",
-												},
-												"end": {
-													Type:        schema.TypeInt,
-													Optional:    true,
-													Description: "End of the port range.",
-												},
-												"start": {
-													Type:        schema.TypeInt,
-													Optional:    true,
-													Description: "Start of the port range.",
-												},
-											},
-										},
-									},
-									"denied_listening_port": {
-										Type:        schema.TypeList,
-										Optional:    true,
-										Description: "List of denied listening ports.",
-										Elem: &schema.Resource{
-											Schema: map[string]*schema.Schema{
-												"deny": {
-													Type:        schema.TypeBool,
-													Optional:    true,
-													Description: "Whether or not to deny the connection.",
-												},
-												"end": {
-													Type:        schema.TypeInt,
-													Optional:    true,
-													Description: "End of the port range.",
-												},
-												"start": {
-													Type:        schema.TypeInt,
-													Optional:    true,
-													Description: "Start of the port range.",
-												},
-											},
-										},
+										Description: "The effect to be used. Can be set to 'block' or 'alert'.",
 									},
 									"denied_outbound_ips": {
 										Type:        schema.TypeList,
@@ -273,49 +244,154 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 											Type: schema.TypeString,
 										},
 									},
-									"denied_outbound_port": {
-										Type:        schema.TypeList,
-										Optional:    true,
-										Description: "List of denied outbound ports.",
-										Elem: &schema.Resource{
-											Schema: map[string]*schema.Schema{
-												"deny": {
-													Type:        schema.TypeBool,
-													Optional:    true,
-													Description: "Whether or not to deny the connection.",
-												},
-												"end": {
-													Type:        schema.TypeInt,
-													Optional:    true,
-													Description: "End of the port range.",
-												},
-												"start": {
-													Type:        schema.TypeInt,
-													Optional:    true,
-													Description: "Start of the port range.",
-												},
-											},
-										},
-									},
-									"deny_effect": {
+									"denied_outbound_ips_effect": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
 									},
-									"detect_port_scan": {
+									"disabled": {
 										Type:        schema.TypeBool,
 										Optional:    true,
-										Description: "Whether or not to detect port scans.",
+										Description: "Whether or not to disable the network rule",
 									},
-									"skip_modified_processes": {
-										Type:        schema.TypeBool,
+									"listening_ports": {
+										Type:        schema.TypeList,
 										Optional:    true,
-										Description: "Whether or not to skip network monitoring for modified processes.",
+										Description: "Rule containing ports to allowed/denied and the required effect.",
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"allowed": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: "List of allowed listening ports.",
+													Elem: &schema.Resource{
+														Schema: map[string]*schema.Schema{
+															"deny": {
+																Type:        schema.TypeBool,
+																Optional:    true,
+																Description: "Whether or not to deny the connection.",
+															},
+															"end": {
+																Type:        schema.TypeInt,
+																Optional:    true,
+																Description: "End of the port range.",
+															},
+															"start": {
+																Type:        schema.TypeInt,
+																Optional:    true,
+																Description: "Start of the port range.",
+															},
+														},
+													},
+												},
+												"denied": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: "List of denied listening ports.",
+													Elem: &schema.Resource{
+														Schema: map[string]*schema.Schema{
+															"deny": {
+																Type:        schema.TypeBool,
+																Optional:    true,
+																Description: "Whether or not to deny the connection.",
+															},
+															"end": {
+																Type:        schema.TypeInt,
+																Optional:    true,
+																Description: "End of the port range.",
+															},
+															"start": {
+																Type:        schema.TypeInt,
+																Optional:    true,
+																Description: "Start of the port range.",
+															},
+														},
+													},
+												},
+												"effect": {
+													Type:        schema.TypeString,
+													Optional:    true,
+													Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
+												},	
+											},
+										},
 									},
-									"skip_raw_sockets": {
-										Type:        schema.TypeBool,
+									"modified_process_effect": {
+										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "Whether or not to skip raw socket detection.",
+										Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
+									},
+									"outbound_ports": {
+										Type:        schema.TypeList,
+										Optional:    true,
+										Description: "Rule containing ports to allowed/denied and the required effect.",
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"allowed": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: "List of allowed listening ports.",
+													Elem: &schema.Resource{
+														Schema: map[string]*schema.Schema{
+															"deny": {
+																Type:        schema.TypeBool,
+																Optional:    true,
+																Description: "Whether or not to deny the connection.",
+															},
+															"end": {
+																Type:        schema.TypeInt,
+																Optional:    true,
+																Description: "End of the port range.",
+															},
+															"start": {
+																Type:        schema.TypeInt,
+																Optional:    true,
+																Description: "Start of the port range.",
+															},
+														},
+													},
+												},
+												"denied": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: "List of denied listening ports.",
+													Elem: &schema.Resource{
+														Schema: map[string]*schema.Schema{
+															"deny": {
+																Type:        schema.TypeBool,
+																Optional:    true,
+																Description: "Whether or not to deny the connection.",
+															},
+															"end": {
+																Type:        schema.TypeInt,
+																Optional:    true,
+																Description: "End of the port range.",
+															},
+															"start": {
+																Type:        schema.TypeInt,
+																Optional:    true,
+																Description: "Start of the port range.",
+															},
+														},
+													},
+												},
+												"effect": {
+													Type:        schema.TypeString,
+													Optional:    true,
+													Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
+												},	
+											},
+										},
+									},
+									"port_scan_effect": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
+									},
+									"raw_sockets_effect": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The effect to be used. Can be set to 'alert' or 'disable'.",
 									},
 								},
 							},
@@ -340,49 +416,68 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 											Type: schema.TypeString,
 										},
 									},
-									"check_crypto_miners": {
-										Type:        schema.TypeBool,
-										Optional:    true,
-										Description: "Whether or not to detect crypto miners.",
-									},
-									"check_lateral_movement": {
-										Type:        schema.TypeBool,
-										Optional:    true,
-										Description: "Whether or not to detect processes that can be used for lateral movement exploits.",
-									},
 									"check_parent_child": {
 										Type:        schema.TypeBool,
 										Optional:    true,
 										Description: "Whether or not to check for parent-child relationship when comparing spawned processes in the model.",
 									},
-									"check_suid_binaries": {
-										Type:        schema.TypeBool,
-										Optional:    true,
-										Description: "Whether or not to check for process-elevating privileges (SUID bit).",
-									},
-									"denied": {
-										Type:        schema.TypeList,
-										Optional:    true,
-										Description: "List of denied processes.",
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
-										},
-									},
-									"deny_effect": {
+									"crypto_miners_effect": {
 										Type:        schema.TypeString,
 										Optional:    true,
 										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
 									},
-									"skip_modified": {
+									"default_effect": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The effect to be used. Can be set to 'alert', 'prevent', or 'block'.",
+									},
+									"denied_list": {
+										Type:        schema.TypeList,
+										Optional:    true,
+										Description: "List of denied processes and its effect to be used.",
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												"effect": {
+													Type:        schema.TypeString,
+													Optional:    true,
+													Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
+												},
+												"paths": {
+													Type:        schema.TypeList,
+													Optional:    true,
+													Description: "List of allowed processes.",
+													Elem: &schema.Schema{
+														Type: schema.TypeString,
+													},
+												},
+											},
+										},
+									}, 
+									"disabled": {
 										Type:        schema.TypeBool,
 										Optional:    true,
-										Description: "Whether or not to skip detection of processes started from modified binaries",
+										Description: "Whether or not to disable the processes rule",
 									},
-									"skip_reverse_shell": {
-										Type:        schema.TypeBool,
+									"lateral_movement_effect": {
+										Type:        schema.TypeString,
 										Optional:    true,
-										Description: "Whether or not skip detection of reverse shells.",
+										Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
 									},
+									"modified_process_effect": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
+									},
+									"reverse_shell_effect": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The effect to be used. Can be set to 'block', 'alert', or 'disable'.",
+									},
+									"suid_binaries_effect": {
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
+									},	
 								},
 							},
 						},

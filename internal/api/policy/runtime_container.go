@@ -16,19 +16,20 @@ type RuntimeContainerPolicy struct {
 }
 
 type RuntimeContainerRule struct {
-	AdvancedProtection       bool                         `json:"advancedProtection"`
-	CloudMetadataEnforcement bool                         `json:"cloudMetadataEnforcement"`
-	Collections              []collection.Collection      `json:"collections,omitempty"`
-	CustomRules              []RuntimeContainerCustomRule `json:"customRules,omitempty"`
-	Disabled                 bool                         `json:"disabled"`
-	Dns                      RuntimeContainerDns          `json:"dns,omitempty"`
-	Filesystem               RuntimeContainerFilesystem   `json:"filesystem,omitempty"`
-	KubernetesEnforcement    bool                         `json:"kubernetesEnforcement"`
-	Name                     string                       `json:"name,omitempty"`
-	Network                  RuntimeContainerNetwork      `json:"network,omitempty"`
-	Notes                    string                       `json:"notes,omitempty"`
-	Processes                RuntimeContainerProcesses    `json:"processes,omitempty"`
-	WildFireAnalysis         string                       `json:"wildFireAnalysis,omitempty"`
+	AdvancedProtectionEffect       string                       `json:"advancedProtectionEffect"`
+	CloudMetadataEnforcementEffect string                       `json:"cloudMetadataEnforcementEffect"`
+	Collections                    []collection.Collection      `json:"collections,omitempty"`
+	CustomRules                    []RuntimeContainerCustomRule `json:"customRules,omitempty"`
+	Disabled                       bool                         `json:"disabled"`
+	Dns                            RuntimeContainerDns          `json:"dns,omitempty"`
+	Filesystem                     RuntimeContainerFilesystem   `json:"filesystem,omitempty"`
+	KubernetesEnforcementEffect    string                       `json:"kubernetesEnforcementEffect"`
+	Name                           string                       `json:"name,omitempty"`
+	Network                        RuntimeContainerNetwork      `json:"network,omitempty"`
+	Notes                          string                       `json:"notes,omitempty"`
+	Processes                      RuntimeContainerProcesses    `json:"processes,omitempty"`
+	SkipExecSessions               bool                         `json:"skipExecSessions"`
+	WildFireAnalysis               string                       `json:"wildFireAnalysis,omitempty"`
 }
 
 type RuntimeContainerCustomRule struct {
@@ -38,50 +39,86 @@ type RuntimeContainerCustomRule struct {
 }
 
 type RuntimeContainerDns struct {
-	Allowed    []string `json:"whitelist,omitempty"`
-	Denied     []string `json:"blacklist,omitempty"`
-	DenyEffect string   `json:"effect,omitempty"`
+	DefaultEffect string                       `json:"effect,omitempty"`
+	Disabled      bool                         `json:"disabled"`
+	DomainLists   []RuntimeContainerDomainList `json:"domainList,omitempty"`
+}
+
+type RuntimeContainerDomainList struct {
+	Allowed []string `json:"allowed,omitempty"`
+	Denied  []string `json:"denied,omitempty"`
+	Effect  string   `json:"effect,omitempty"`
 }
 
 type RuntimeContainerFilesystem struct {
-	Allowed               []string `json:"whitelist,omitempty"`
-	BackdoorFiles         bool     `json:"backdoorFiles"`
-	CheckNewFiles         bool     `json:"checkNewFiles"`
-	Denied                []string `json:"blacklist,omitempty"`
-	DenyEffect            string   `json:"effect,omitempty"`
-	SkipEncryptedBinaries bool     `json:"skipEncryptedBinaries"`
-	SuspiciousElfHeaders  bool     `json:"suspiciousELFHeaders"`
+	Allowed                    []string                               `json:"allowedList,omitempty"`
+	BackdoorFilesEffect        string                                 `json:"backdoorFiles,omitempty"`
+	DefaultEffect              string                                 `json:"defaultEffect,omitempty"`
+	DeniedList                 []RuntimeContainerFilesystemDeniedList `json:"deniedList,omitempty"`
+	Disabled                   bool                                   `json:"disabled"`
+	EncryptedBinariesEffect    string                                 `json:"encryptedBinariesEffect,omitempty"`
+	NewFilesEffect             string                                 `json:"newFilesEffect,omitempty"`
+	SuspiciousELFHeadersEffect string                                 `json:"suspiciousELFHeadersEffect,omitempty"`
+}
+
+type RuntimeContainerFilesystemDeniedList struct {
+	Effect string   `json:"effect,omitempty"`
+	Paths  []string `json:"paths,omitempty"`
 }
 
 type RuntimeContainerNetwork struct {
-	AllowedListeningPorts []RuntimeContainerPort `json:"whitelistListeningPorts,omitempty"`
-	AllowedOutboundIps    []string               `json:"whitelistIPs,omitempty"`
-	AllowedOutboundPorts  []RuntimeContainerPort `json:"whitelistOutboundPorts,omitempty"`
-	DeniedListeningPorts  []RuntimeContainerPort `json:"blacklistListeningPorts,omitempty"`
-	DeniedOutboundIps     []string               `json:"blacklistIPs,omitempty"`
-	DeniedOutboundPorts   []RuntimeContainerPort `json:"blacklistOutboundPorts,omitempty"`
-	DenyEffect            string                 `json:"effect,omitempty"`
-	DetectPortScan        bool                   `json:"detectPortScan"`
-	SkipModifiedProcesses bool                   `json:"skipModifiedProc"`
-	SkipRawSockets        bool                   `json:"skipRawSockets"`
+	AllowedIPs            []string                        `json:"allowedIPs,omitempty"`
+	DefaultEffect         string                          `json:"defaultEffect,omitempty"`
+	DeniedIPs             []string                        `json:"deniedIPs,omitempty"`
+	DeniedIPsEffect       string                          `json:"deniedIPsEffect,omitempty"`
+	Disabled              bool                            `json:"disabled"`
+	ListeningPorts        []RuntimeContainerListeningPort `json:"listeningPorts,omitempty"`
+	ModifiedProcessEffect string                          `json:"modifiedProcessEffect,omitempty"`
+	OutboundPorts         []RuntimeContainerOutboundPort  `json:"outboundPorts,omitempty"`
+	PortScanEffect        string                          `json:"portScanEffect,omitempty"`
+	RawSocketEffect       string                          `json:"rawSocketEffect,omitempty"`
 }
 
-type RuntimeContainerPort struct {
+type RuntimeContainerListeningPort struct {
+	Allow  []RuntimeContainerAllowedPort `json:"allow,omitempty"`
+	Deny   []RuntimeContainerDeniedPort  `json:"deny,omitempty"`
+	Effect string                        `json:"effect,omitempty"`
+}
+
+type RuntimeContainerOutboundPort struct {
+	Allow  []RuntimeContainerAllowedPort `json:"allow,omitempty"`
+	Deny   []RuntimeContainerDeniedPort  `json:"deny,omitempty"`
+	Effect string                        `json:"effect,omitempty"`
+}
+
+type RuntimeContainerAllowedPort struct {
+	Deny  bool `json:"deny"`
+	End   int  `json:"end,omitempty"`
+	Start int  `json:"start,omitempty"`
+}
+
+type RuntimeContainerDeniedPort struct {
 	Deny  bool `json:"deny"`
 	End   int  `json:"end,omitempty"`
 	Start int  `json:"start,omitempty"`
 }
 
 type RuntimeContainerProcesses struct {
-	Allowed              []string `json:"whitelist,omitempty"`
-	CheckCryptoMiners    bool     `json:"checkCryptoMiners"`
-	CheckLateralMovement bool     `json:"checkLateralMovement"`
-	CheckParentChild     bool     `json:"checkParentChild"`
-	CheckSuidBinaries    bool     `json:"checkSuidBinaries"`
-	Denied               []string `json:"blacklist,omitempty"`
-	DenyEffect           string   `json:"effect,omitempty"`
-	SkipModified         bool     `json:"skipModified"`
-	SkipReverseShell     bool     `json:"skipReverseShell"`
+	AllowedList           []string                            `json:"allowedList,omitempty"`
+	CheckParentChild      bool                                `json:"checkParentChild"`
+	CryptoMinersEffect    string                              `json:"cryptoMinersEffect,omitempty"`
+	DefaultEffect         string                              `json:"defaultEffect,omitempty"`
+	DeniedList            []RuntimeContainerProcessDeniedList `json:"deniedList,omitempty"`
+	Disabled              bool                                `json:"disabled"`
+	LateralMovementEffect string                              `json:"lateralMovementEffect,omitempty"`
+	ModifiedProcessEffect string                              `json:"modifiedProcessesEffect,omitempty"`
+	ReverseShellEffect    string                              `json:"reverseShellEffect,omitempty"`
+	SuidBinariesEffect    string                              `json:"suidBinariesEffect,omitempty"`
+}
+
+type RuntimeContainerProcessDeniedList struct {
+	Effect string   `json:"effect,omitempty"`
+	Paths  []string `json:"paths,omitempty"`
 }
 
 // Get the current container runtime policy.
