@@ -236,18 +236,20 @@ func runtimeContainerDnsToSchema(in policy.RuntimeContainerDns) []interface{} {
 	m := make(map[string]interface{})
 	m["default_effect"] = in.DefaultEffect
 	m["disabled"] = in.Disabled
-	m["domain_list"] = runtimeContainerDomainListToSchema(val.DomainLists)
+	m["domain_list"] = runtimeContainerDomainListToSchema(in.DomainLists)
 	ans = append(ans, m)
 	return ans
 }
 
-func runtimeContainerDomainListToSchema(in policy.RuntimeContainerDomainList) []interface{} {
-	ans := make([]interface{}, 0, 1)
-	m := make(map[string]interface{})
-	m["allowed"] = in.Allowed
-	m["denied"] = in.Denied
-	m["deny_effect"] = in.Effect
-	ans = append(ans, m)
+func runtimeContainerDomainListToSchema(in []policy.RuntimeContainerDomainList) []interface{} {
+	ans := make([]interface{}, 0, len(in))
+	for _, val := range in {
+		m := make(map[string]interface{})
+		m["allowed"] = val.Allowed
+		m["denied"] = val.Denied
+		m["deny_effect"] = val.Effect
+		ans = append(ans, m)
+	}
 	return ans
 }
 
