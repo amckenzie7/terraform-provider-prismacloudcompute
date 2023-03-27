@@ -59,7 +59,7 @@ func SchemaToRuntimeContainerRules(d *schema.ResourceData) ([]policy.RuntimeCont
 				parsedRule.Filesystem = policy.RuntimeContainerFilesystem{}
 			}
 
-			parsedRule.KubernetesEnforcementEffect = presentRule["kubernetes_enforcement"].(string)
+			parsedRule.KubernetesEnforcementEffect = presentRule["kubernetes_enforcement_effect"].(string)
 			parsedRule.Name = presentRule["name"].(string)
 
 			if presentRule["network"].([]interface{})[0] != nil {

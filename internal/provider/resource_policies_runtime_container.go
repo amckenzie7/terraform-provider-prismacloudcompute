@@ -206,7 +206,7 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 								},
 							},
 						},
-						"kubernetes_enforcement": {
+						"kubernetes_enforcement_effect": {
 							Type:        schema.TypeString,
 							Optional:    true,
 							Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
