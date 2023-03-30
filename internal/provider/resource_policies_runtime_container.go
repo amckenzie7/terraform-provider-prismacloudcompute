@@ -125,7 +125,7 @@ func resourcePoliciesRuntimeContainer() *schema.Resource {
 														Type: schema.TypeString,
 													},
 												},
-												"deny_effect": {
+												"effect": {
 													Type:        schema.TypeString,
 													Optional:    true,
 													Description: "The effect to be used. Can be set to 'block', 'prevent', 'alert', or 'disable'.",
